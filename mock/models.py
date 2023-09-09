@@ -21,13 +21,6 @@ class MockWritingQuestion(models.Model):
         db_table = 'mock_writing_question'
         ordering = ['id']
 
-    def save(self, *args, **kwargs):
-        existing_questions = MockWritingQuestion.objects.filter(writing_id=self.writing_id).count()
-
-        if existing_questions >= 2:
-            raise ValidationError("A MockWriting instance can only have 2 questions.")
-
-        super(MockWritingQuestion, self).save(*args, **kwargs)
 
 
 class MockWritingResponse(models.Model):
