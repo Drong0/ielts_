@@ -51,3 +51,46 @@ class CustomTokenObtainSerializer(TokenObtainSerializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer, CustomTokenObtainSerializer):
     pass
+
+
+class EditProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=False, allow_null=True)
+    password = serializers.CharField(required=False, allow_null=True, write_only=True)
+    new_password = serializers.CharField(required=False, allow_null=True, write_only=True)
+    new_password_confirm = serializers.CharField(required=False, allow_null=True, write_only=True)
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def validate(self, a):
+        password = a.pop('password', None)
+        new_password = a.get('new_password', None)
+        new_password_confirm = a.pop('new_password_confirm', None)
+        email = a.get('email')
+
+        if email and not password:
+            raise serializers.ValidationError({'password': 'Пароль обязательный'})
+
+        if new_password and not password:
+            raise serializers.ValidationError({'password': 'Старый пароль обязательный'})
+
+        if new_password and new_password != new_password_confirm:
+            raise serializers.ValidationError({'new_password_confirm': 'Подтверждение пароля обязательно'})
+
+        if new_password and not self.instance.check_password(password):
+            raise serializers.ValidationError({'password': 'Пароль неверный'})
+
+        if email and not self.instance.check_password(password):
+            raise serializers.ValidationError({'password': 'Пароль неверный'})
+
+        return a
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.pop('new_password', None)
+        instance = super().update(instance, validated_data)
+        if new_password:
+            instance.set_password(new_password)
+            instance.save(update_fields=['password'])
+
+        return instance

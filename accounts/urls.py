@@ -15,12 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from accounts.views import TokenObtainPairViewCustom, RegistrationView
+from accounts.views import TokenObtainPairViewCustom, RegistrationView, EditProfileView
 
 urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -29,4 +29,7 @@ urlpatterns = [
     path('obtain-token/', TokenObtainPairViewCustom.as_view(), name='token_obtain_pair'),
     path('token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register/', RegistrationView.as_view(), name='register'),
+
+    path('profile/', EditProfileView.as_view({'get': 'get'}), name='get-profile'),
+    path('profile/edit/', EditProfileView.as_view({'patch': 'patch'}), name='update-profile'),
 ]
