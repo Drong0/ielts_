@@ -39,6 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = LowercaseEmailField(unique=True)
     email_approved = models.BooleanField(default=False)
     phone = PhoneNumberField(unique=True, blank=True)
+    profile_photo = models.ImageField(upload_to='profile_photos', blank=True, null=True)
     role = models.ForeignKey('Role', on_delete=models.PROTECT, related_name='role', blank=True, default='', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
